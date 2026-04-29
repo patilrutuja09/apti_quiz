@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="card shadow p-4 text-center">
+    <h2>Quiz Result</h2>
+    <hr>
+
+    <h4>Your Score: {{ score }}</h4>
+    <h4>Percentage: {{ percentage }}%</h4>
+
+    {% if percentage >= 50 %}
+      <div class="alert alert-success mt-3">
+        Congratulations! You passed the quiz 🎉
+      </div>
+
+      {% if certificate %}
+        <a href="{{ url_for('download_certificate', filename=certificate) }}" 
+           class="btn btn-success mt-3">
+          Download Certificate
+        </a>
+      {% endif %}
+
+    {% else %}
+      <div class="alert alert-danger mt-3">
+        You did not pass. Try again!
+      </div>
+    {% endif %}
+
+    <a href="/leaderboard" class="btn btn-primary mt-3">
+      View Leaderboard
+    </a>
+  </div>
+
+  <!-- Answer Review Section -->
+  <h4 class="mt-5">Answer Review</h4>
+
+  {% for r in results %}
+  <div class="card mt-3 p-3
+      {% if r.status == 'correct' %}border-success
+      {% elif r.status == 'wrong' %}border-danger
+      {% else %}border-secondary{% endif %}">
+
+      <p><strong>Q{{ loop.index }}:</strong> {{ r.question }}</p>
+
+      <p>
+        Your Answer:
+        <strong>{{ r.user_ans if r.user_ans else "Not Attempted" }}</strong>
+      </p>
+
+      <p>
+        Correct Answer:
+        <strong>{{ r.correct_ans }}</strong>
+      </p>
+
+      {% if r.status == "correct" %}
+        <span class="text-success">✔ Correct</span>
+      {% elif r.status == "wrong" %}
+        <span class="text-danger">✘ Wrong</span>
+      {% else %}
+        <span class="text-muted">Skipped</span>
+      {% endif %}
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

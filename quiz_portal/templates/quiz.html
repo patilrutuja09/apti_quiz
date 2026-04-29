@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-wrapper">
+<div class="quiz-container">
+
+  <!-- LEFT SIDE -->
+  <div class="quiz-left">
+
+    <div class="quiz-header">
+      <h3>Online Quiz</h3>
+      <div class="timer">⏳ <span id="time">120</span>s</div>
+    </div>
+
+    <form method="POST" action="/submit" id="quizForm">
+
+      {% for q in questions %}
+
+      <div class="question" id="q{{loop.index}}" style="display:none">
+
+        <p class="q-title">Q{{loop.index}}. {{q[1]}}</p>
+
+        <div class="options">
+          <label>
+  <input type="radio" name="{{q[0]}}" value="{{q[2]}}" onclick="markAnswered({{loop.index}})">
+  {{q[2]}}
+</label>
+
+<label>
+  <input type="radio" name="{{q[0]}}" value="{{q[3]}}" onclick="markAnswered({{loop.index}})">
+  {{q[3]}}
+</label>
+
+<label>
+  <input type="radio" name="{{q[0]}}" value="{{q[4]}}" onclick="markAnswered({{loop.index}})">
+  {{q[4]}}
+</label>
+
+<label>
+  <input type="radio" name="{{q[0]}}" value="{{q[5]}}" onclick="markAnswered({{loop.index}})">
+  {{q[5]}}
+</label></div>
+
+      </div>
+
+      {% endfor %}
+
+      <div class="quiz-actions">
+        <button type="button" class="btn prev" onclick="prevQuestion()">⬅</button>
+        <button type="button" class="btn next" onclick="nextQuestion()">➡</button>
+        <button class="btn submit">Submit</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="quiz-right">
+
+    <h4>Questions</h4>
+
+    <div class="palette">
+      {% for q in questions %}
+      <div class="qbtn" id="btn{{loop.index}}" onclick="showQuestion({{loop.index}})">
+        {{loop.index}}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+</div>
+<!-- JS -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+let current = 1;
+let questions = document.querySelectorAll(".question");
+let total = questions.length;
+
+/* Show question */
+window.showQuestion = function(n){
+  questions.forEach(q => q.style.display="none");
+
+  document.getElementById("q"+n).style.display="block";
+
+  // remove active from all buttons
+  document.querySelectorAll(".qbtn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  // add active to current
+  document.getElementById("btn"+n).classList.add("active");
+
+  current = n;
+}
+
+/* Next */
+window.nextQuestion = function(){
+if(current < total){
+current++;
+showQuestion(current);
+}
+}
+
+/* Prev */
+window.prevQuestion = function(){
+if(current > 1){
+current--;
+showQuestion(current);
+}
+}
+
+/* Mark answered */
+window.markAnswered = function(n){
+let btn = document.getElementById("btn"+n);
+btn.classList.add("answered");
+}
+
+/* Timer */
+let time = 120;
+
+let timer = setInterval(function(){
+
+time--;
+document.getElementById("time").innerText = time;
+
+if(time <= 0){
+clearInterval(timer);
+alert("Time Over");
+document.getElementById("quizForm").submit();
+}
+
+},1000);
+
+/* Start */
+showQuestion(1);
+
+});
+
+</script>
+
+{% endblock %}

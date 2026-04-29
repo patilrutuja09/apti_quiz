@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+<!-- SIDEBAR -->
+
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+<h2 style="color: rgb(8, 42, 76);">Welcome, {{name}}</h2>
+
+<!-- STATS -->
+<div class="row">
+
+<div class="col-md-3 dashboard-grid">
+<div class="card">
+<p class="card">Total Attempts</p>
+<h3 id="total">{{total_attempts}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card">
+<p class="card">Best Score</p>
+<h3 id="best">{{best_score}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card">
+<p class="card">Average</p>
+<h3 id="avg">{{avg_score}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card">
+<p class="card">🔥 Streak</p>
+<h3 id="streak">{{streak}}</h3>
+</div>
+</div>
+
+</div>
+
+<!-- BADGE -->
+<div class="card">
+
+<h5>Your Rank</h5>
+
+{% if avg_score >= 80 %}
+<span class="badge-rank gold rank-bar">🏆 Gold</span>
+{% elif avg_score >= 50 %}
+<span class="badge-rank silver rank-bar">🥈 Silver</span>
+{% else %}
+<span class="badge-rank bronze rank-bar">🥉 Bronze</span>
+{% endif %}
+
+</div>
+
+<!-- CHART -->
+<div class="card chart-container">
+<h5>Performance Trend</h5>
+<canvas id="chart"></canvas>
+</div>
+
+<!-- ACTION -->
+
+
+<!-- TABLE -->
+<div class="card">
+
+<h5>Your Performance</h5>
+
+<button class="btn btn-danger mb-3 px-3" onclick="deleteAll()">🗑 Delete All</button>
+
+<table class="table">
+<tr>
+<th>Score</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+
+{% for r in results %}
+<tr id="row{{r['id']}}">
+<td>{{r['score']}}</td>
+<td>{{r['date']}}</td>
+<td>
+<button class="btn btn-danger btn-sm"
+onclick="deleteOne({{r['id']}})">🗑</button>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+<!-- JS -->
+<script>
+
+// CHART DATA
+let scores = {{ scores | tojson }}
+let labels = scores.map((_, i) => "Attempt " + (i+1))
+
+// DRAW CHART
+new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Score",
+            data: scores,
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    }
+});
+
+// DELETE ONE
+function deleteOne(id){
+    fetch("/delete_result/" + id, { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            document.getElementById("row"+id).remove();
+            updateStats();
+        }
+    });
+}
+
+// DELETE ALL
+function deleteAll(){
+    fetch("/delete_all_results", { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            document.querySelectorAll("tr[id^='row']")
+            .forEach(r => r.remove());
+            updateStats();
+        }
+    });
+}
+
+// UPDATE STATS
+function updateStats(){
+    fetch("/get_stats")
+    .then(res => res.json())
+    .then(s => {
+        document.getElementById("total").innerText = s.total;
+        document.getElementById("best").innerText = s.best;
+        document.getElementById("avg").innerText = s.avg;
+    });
+}
+
+</script>
+
+{% endblock %}

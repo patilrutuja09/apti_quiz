@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Leaderboard</h2>
+
+<table class="table table-striped">
+
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Top Score</th>
+<th>Date</th>
+</tr>
+
+{% for p in players %}
+
+<tr>
+<td>{{loop.index}}</td>
+<td>{{p['name']}}</td>
+<td>{{p['top']}}</td>
+<td>{{p['date']}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<a class="btn btn-secondary" href="/dashboard">Back</a>
+
+{% endblock %}
