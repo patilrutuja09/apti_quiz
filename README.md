@@ -136,13 +136,7 @@ quiz_portal/
 
 ---
 
-## 🔒 Important Notes
 
-* Do **not upload `quiz.db` with real user data**
-* Add `.env` if you later use secret keys
-* Use `.gitignore` to exclude unnecessary files
-
----
 
 ## 🔮 Future Improvements
 
